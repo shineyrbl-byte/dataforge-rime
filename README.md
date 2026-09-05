@@ -158,10 +158,24 @@ Rime is used as the primary spoken-output layer of the voice agent through the o
 tts = rime.TTS(
     model="coda",
     speaker="celeste",
+    lang="eng",
     use_websocket=True,
     segment="bySentence",
 )
 ```
+
+**Shipped Rime configuration**
+
+* **Model:** `coda`
+* **Speaker:** `celeste`
+* **Language:** `eng`
+* **Transport:** WebSocket
+* **Endpoint:** `wss://users-ws.rime.ai/ws3`
+* **Audio format:** PCM
+* **Sampling rate:** `22050 Hz`
+* **Segmentation:** `bySentence`
+
+The endpoint and audio parameters above are the values used by the installed LiveKit Rime plugin for the shipped WebSocket configuration.
 
 Rime was verified in the live prototype by producing spoken agent responses in the browser.
 

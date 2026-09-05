@@ -14,10 +14,21 @@ The agent initializes Rime with:
 tts = rime.TTS(
     model="coda",
     speaker="celeste",
+    lang="eng",
     use_websocket=True,
     segment="bySentence",
 )
 ```
+**Shipped Rime configuration**
+
+- Model: `coda`
+- Speaker: `celeste`
+- Language: `eng`
+- Transport: WebSocket
+- Endpoint: `wss://users-ws.rime.ai/ws3`
+- Audio format: PCM
+- Sampling rate: `22050 Hz`
+- Segmentation: `bySentence`
 
 ## Voice Pipeline
 
