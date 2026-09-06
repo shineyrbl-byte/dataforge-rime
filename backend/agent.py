@@ -208,6 +208,7 @@ class TravelAgent(Agent):
     @function_tool(on_duplicate="reject")
     async def search_hotels(
         self,
+        ctx: RunContext,
         destination: Annotated[str, "City or destination where the user wants a hotel"],
         check_in: Annotated[str, "Check-in date in YYYY-MM-DD format"],
         check_out: Annotated[str, "Check-out date in YYYY-MM-DD format"],
@@ -229,6 +230,7 @@ class TravelAgent(Agent):
         """
 
         generation = self.controller.current_generation
+        await ctx.update("Sure, I'll search up some hotels for you.")
         
         if not check_in or not check_out:
             return "Please provide both check-in and check-out dates."
