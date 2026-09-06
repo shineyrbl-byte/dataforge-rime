@@ -304,6 +304,7 @@ class TravelAgent(Agent):
     @function_tool
     async def create_flight_booking(
         self,
+        ctx: RunContext,
         option_number: Annotated[
             int,
             "The numbered flight option selected by the user, from 1 to 5"
@@ -316,6 +317,7 @@ class TravelAgent(Agent):
         """
 
         generation = self.controller.current_generation
+        await ctx.update("Sure, I'll book that flight for you.")
 
         if generation is None:
             return "No active conversation generation."
@@ -483,6 +485,7 @@ class TravelAgent(Agent):
     @function_tool
     async def create_hotel_booking(
         self,
+        ctx: RunContext,
         hotel_name: Annotated[str, "Exact hotel name selected by the user"],
         destination: Annotated[str, "City or destination of the hotel"],
         check_in: Annotated[str, "Check-in date in YYYY-MM-DD format"],
@@ -501,6 +504,7 @@ class TravelAgent(Agent):
         """
 
         generation = self.controller.current_generation
+        await ctx.update("Sure, I'll book that hotel for you.")
 
         if generation is None:
             return "No active conversation generation."
