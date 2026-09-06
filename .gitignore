@@ -37,3 +37,4 @@ benchmarks/results/*
 # Temporary files
 *.tmp
 .env.local
+.vercel

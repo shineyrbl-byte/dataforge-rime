@@ -34,6 +34,14 @@ Even if an external operation ignores cancellation and eventually returns, its r
 
 ---
 
+## 🚀 Live Demo
+
+**[Try the deployed voice agent](https://dataforge-rime.vercel.app)**
+
+> Public demo of the Interruptible Travel Operations Voice Agent, powered by LiveKit and Rime TTS.
+
+---
+
 ## Why This Matters
 
 Voice agents create a particularly difficult race condition.
