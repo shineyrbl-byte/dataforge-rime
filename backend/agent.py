@@ -1,5 +1,5 @@
 from typing import Annotated
-from livekit.agents import function_tool
+from livekit.agents import RunContext, function_tool
 from backend.tools.registry import get_tool
 from backend.tools.executor import execute_tool
 import logging
@@ -373,6 +373,7 @@ class TravelAgent(Agent):
     @function_tool
     async def search_flights(
         self,
+        ctx: RunContext,
         origin: Annotated[str, "3-letter IATA airport code for departure, e.g. BOM for Mumbai"],
         destination: Annotated[str, "3-letter IATA airport code for arrival, e.g. NRT for Tokyo"],
         departure_date: Annotated[str, "Departure date in YYYY-MM-DD format"],
@@ -393,6 +394,7 @@ class TravelAgent(Agent):
         """
 
         generation = self.controller.current_generation
+        await ctx.update("Sure, I'll check the available flights.")
 
         if generation is None:
             return "No active conversation generation."
