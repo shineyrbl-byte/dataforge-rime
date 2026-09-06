@@ -170,45 +170,47 @@ async def create_flight_booking(offer_id: str) -> dict:
 
         offer_data = offer_response.json().get("data", {})
         offer_passengers = offer_data.get("passengers", [])
-        if len(offer_passengers) < 2:
+        if not offer_passengers:
             return {
                 "tool": "create_flight_booking",
                 "status": "error",
-                "message": "The selected offer does not contain two passengers.",
+                "message": "The selected offer does not contain any passengers.",
             }
 
-        passenger_0_id = offer_passengers[0]["id"]
-        passenger_1_id = offer_passengers[1]["id"]
+        passengers = []
 
+        for i, passenger in enumerate(offer_passengers):
+            if i == 0:
+                passengers.append({
+                    "id": passenger["id"],
+                    "type": "adult",
+                    "given_name": "Amelia",
+                    "family_name": "Earhart",
+                    "title": "ms",
+                    "gender": "f",
+                    "born_on": "1995-07-24",
+                    "email": "amelia.earhart@example.com",
+                    "phone_number": "+442080160509",
+                })
+            else:
+                passengers.append({
+                    "id": passenger["id"],
+                    "type": "adult",
+                    "given_name": "John",
+                    "family_name": "Doe",
+                    "title": "mr",
+                    "gender": "m",
+                    "born_on": "1994-05-15",
+                    "email": "john.doe@example.com",
+                    "phone_number": "+442080160510",
+                })
+        
         payload = {
             "data": {
                 "type": "instant",
                 "selected_offers": [offer_id],
                 "payments": [],
-                "passengers": [
-                    {
-                        "id": passenger_0_id,
-                        "type": "adult",
-                        "given_name": "Amelia",
-                        "family_name": "Earhart",
-                        "title": "ms",
-                        "gender": "f",
-                        "born_on": "1995-07-24",
-                        "email": "amelia.earhart@example.com",
-                        "phone_number": "+442080160509",
-                    },
-                    {
-                        "id": passenger_1_id,
-                        "type": "adult",
-                        "given_name": "John",
-                        "family_name": "Doe",
-                        "title": "mr",
-                        "gender": "m",
-                        "born_on": "1994-05-15",
-                        "email": "john.doe@example.com",
-                        "phone_number": "+442080160510",
-                    },
-                ],
+                "passengers": passengers,
             }
         }
 
