@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 
 from .fence import Generation, GenerationFence, GenerationStatus
-from backend.state.conversation import AgentState
+from backend.state.conversation import AgentState, Booking
 
 class OperationStatus(Enum):
     RUNNING = auto()
@@ -40,6 +40,13 @@ class TurnController:
         self.fence = GenerationFence()
         self.conversation_history: list[dict] = []
         self.state = AgentState()
+        # Deterministic demo booking used by the interruption/stale-result demo.
+        self.state.bookings["FLT-DEMO-TYO"] = Booking(
+            booking_id="FLT-DEMO-TYO",
+            booking_type="flight",
+            destination="TYO",
+            status="confirmed",
+        )
 
         self._current_context: TurnContext | None = None
         self._operations: dict[str, Operation] = {}
@@ -187,6 +194,23 @@ class TurnController:
 
             if booking_id in self.state.bookings:
                 self.state.bookings[booking_id].status = result["status"]
+
+        elif tool == "create_hotel_booking":
+            booking_id = result["booking_id"]
+
+            self.state.bookings[booking_id] = Booking(
+                booking_id=booking_id,
+                booking_type="hotel",
+                destination=result["destination"],
+                status="confirmed",
+                hotel_name=result["hotel_name"],
+                check_in=result["check_in"],
+                check_out=result["check_out"],
+                adults=result["adults"],
+                children=result["children"],
+                price_per_night=result.get("price_per_night"),
+                currency=result.get("currency"),
+            )
 
     def cancel_generation_operations(self, generation_id: int) -> int:
         """
