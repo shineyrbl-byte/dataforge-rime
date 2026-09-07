@@ -289,6 +289,9 @@ def get_currency_for_destination(destination: str) -> str | None:
     """Return the local currency for a destination."""
 
     COUNTRY_CURRENCY = {
+        "kazakhstan": "KZT",
+        "almaty": "KZT",
+        "astana": "KZT",
         # Asia
         "india": "INR",
         "japan": "JPY",
@@ -332,7 +335,6 @@ def get_currency_for_destination(destination: str) -> str | None:
         "iran": "IRR",
         "iraq": "IQD",
         "türkiye": "TRY",
-        "kazakhstan": "KZT",
         "uzbekistan": "UZS",
         "georgia": "GEL",
         "armenia": "AMD",
@@ -526,6 +528,9 @@ def get_currency_for_destination(destination: str) -> str | None:
         "goa": "INR",
         "kyrgyzstan": "KGS",
         "bishkek": "KGS",
+        "kazakhstan": "KZT",
+        "almaty": "KZT",
+        "astana": "KZT",
         # Japan
         "tokyo": "JPY",
         "osaka": "JPY",
