@@ -713,10 +713,13 @@ async def search_hotels(
             price = hotel.get("price", {})
             print ("DEBUG REQUESTED CURRENCY:", currency)
             print ("DEBUG STAYAPI PRICE:", price)
+            rating = hotel.get("rating", {})
 
             results.append(
                 {
                     "name": hotel.get("name"),
+                    "rating": rating.get("value"),
+                    "votes": rating.get("votes"),
                     "price_per_night": price.get("price_per_night"),
                     "currency": price.get("currency") or currency,
                     "description": hotel.get("description"),
