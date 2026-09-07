@@ -521,6 +521,21 @@ class TravelAgent(Agent):
         if children is None:
             children = 0
 
+        for existing_booking in self.controller.state.bookings.values():
+            if (
+                existing_booking.booking_type == "hotel"
+                and existing_booking.hotel_name
+                and existing_booking.hotel_name.lower() == hotel_name.lower()
+                and existing_booking.destination.lower() == destination.lower()
+                and existing_booking.check_in == check_in
+                and existing_booking.check_out == check_out
+                and existing_booking.status == "confirmed"
+            ):
+                return (
+                    f"That hotel is already booked. "
+                    f"Booking ID {existing_booking.booking_id}."
+                )    
+        
         result = await execute_tool(
             self.controller,
             generation.generation_id,
@@ -546,6 +561,21 @@ class TravelAgent(Agent):
             return f"Hotel booking failed: {result.get('message', 'Unknown error')}"
 
         booking_id = result.get("booking_id")
+
+        self.controller.state.bookings[booking_id] = Booking(
+            booking_id=booking_id,
+            booking_type="hotel",
+            destination=destination,
+            status="confirmed",
+            hotel_name=hotel_name,
+            check_in=check_in,
+            check_out=check_out,
+            adults=adults,
+            children=children,
+            price_per_night=price_per_night,
+            currency=currency,
+        )
+
 
         return (
             f"Demo booking created for {hotel_name} in {destination}. "
