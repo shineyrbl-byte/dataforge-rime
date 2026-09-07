@@ -277,59 +277,201 @@ async def create_flight_booking(offer_id: str) -> dict:
         }
 
 def get_currency_for_destination(destination: str) -> str:
-    """Return the currency for a destination without a network lookup."""
+    """Return the local currency for a destination."""
 
-    CURRENCY_BY_DESTINATION = {
-        "japan": "JPY",
-        "tokyo": "JPY",
-        "osaka": "JPY",
-
-        "france": "EUR",
-        "paris": "EUR",
-
-        "germany": "EUR",
-        "berlin": "EUR",
-
-        "italy": "EUR",
-        "rome": "EUR",
-
-        "spain": "EUR",
-        "madrid": "EUR",
-
-        "united kingdom": "GBP",
-        "uk": "GBP",
-        "london": "GBP",
-
+    COUNTRY_CURRENCY = {
+        # Asia
         "india": "INR",
-        "mumbai": "INR",
-        "delhi": "INR",
-
-        "united states": "USD",
-        "usa": "USD",
-        "new york": "USD",
-        "los angeles": "USD",
-
-        "canada": "CAD",
-        "toronto": "CAD",
-        "vancouver": "CAD",
-
-        "australia": "AUD",
-        "sydney": "AUD",
-        "melbourne": "AUD",
-
+        "japan": "JPY",
+        "china": "CNY",
+        "south korea": "KRW",
+        "korea": "KRW",
+        "thailand": "THB",
+        "vietnam": "VND",
+        "indonesia": "IDR",
+        "malaysia": "MYR",
         "singapore": "SGD",
-
-        "dubai": "AED",
+        "philippines": "PHP",
+        "taiwan": "TWD",
+        "hong kong": "HKD",
+        "nepal": "NPR",
+        "sri lanka": "LKR",
+        "bangladesh": "BDT",
+        "pakistan": "PKR",
         "uae": "AED",
         "united arab emirates": "AED",
+        "saudi arabia": "SAR",
+        "qatar": "QAR",
+        "israel": "ILS",
+        "turkey": "TRY",
 
+        # Europe
+        "united kingdom": "GBP",
+        "uk": "GBP",
+        "england": "GBP",
+        "france": "EUR",
+        "germany": "EUR",
+        "italy": "EUR",
+        "spain": "EUR",
+        "portugal": "EUR",
+        "netherlands": "EUR",
+        "belgium": "EUR",
+        "austria": "EUR",
+        "ireland": "EUR",
+        "greece": "EUR",
+        "finland": "EUR",
+        "sweden": "SEK",
+        "norway": "NOK",
+        "denmark": "DKK",
         "switzerland": "CHF",
-        "zurich": "CHF",
-        "geneva": "CHF",
+        "poland": "PLN",
+        "czech republic": "CZK",
+        "czechia": "CZK",
+        "hungary": "HUF",
+        "romania": "RON",
+        "ukraine": "UAH",
+
+        # North America
+        "united states": "USD",
+        "usa": "USD",
+        "canada": "CAD",
+        "mexico": "MXN",
+
+        # South America
+        "brazil": "BRL",
+        "argentina": "ARS",
+        "chile": "CLP",
+        "colombia": "COP",
+        "peru": "PEN",
+        "uruguay": "UYU",
+
+        # Oceania
+        "australia": "AUD",
+        "new zealand": "NZD",
+        "fiji": "FJD",
+
+        # Africa
+        "south africa": "ZAR",
+        "egypt": "EGP",
+        "morocco": "MAD",
+        "kenya": "KES",
+        "nigeria": "NGN",
+        "ghana": "GHS",
+        "tanzania": "TZS",
     }
 
-    key = destination.strip().lower()
-    return CURRENCY_BY_DESTINATION.get(key, "USD")
+    CITY_CURRENCY = {
+        # India
+        "mumbai": "INR",
+        "delhi": "INR",
+        "new delhi": "INR",
+        "bangalore": "INR",
+        "bengaluru": "INR",
+        "hyderabad": "INR",
+        "chennai": "INR",
+        "kolkata": "INR",
+        "pune": "INR",
+        "goa": "INR",
+
+        # Japan
+        "tokyo": "JPY",
+        "osaka": "JPY",
+        "kyoto": "JPY",
+
+        # China
+        "beijing": "CNY",
+        "shanghai": "CNY",
+
+        # South Korea
+        "seoul": "KRW",
+
+        # Thailand
+        "bangkok": "THB",
+        "phuket": "THB",
+
+        # Singapore
+        "singapore": "SGD",
+
+        # UK
+        "london": "GBP",
+        "manchester": "GBP",
+        "edinburgh": "GBP",
+
+        # Europe
+        "paris": "EUR",
+        "berlin": "EUR",
+        "rome": "EUR",
+        "madrid": "EUR",
+        "barcelona": "EUR",
+        "amsterdam": "EUR",
+        "vienna": "EUR",
+        "lisbon": "EUR",
+        "athens": "EUR",
+
+        # USA
+        "new york": "USD",
+        "los angeles": "USD",
+        "chicago": "USD",
+        "san francisco": "USD",
+        "las vegas": "USD",
+        "miami": "USD",
+        "seattle": "USD",
+
+        # Canada
+        "toronto": "CAD",
+        "vancouver": "CAD",
+        "montreal": "CAD",
+
+        # Australia
+        "sydney": "AUD",
+        "melbourne": "AUD",
+        "brisbane": "AUD",
+
+        # UAE
+        "dubai": "AED",
+        "abu dhabi": "AED",
+
+        # Switzerland
+        "zurich": "CHF",
+        "geneva": "CHF",
+
+        # Turkey
+        "istanbul": "TRY",
+        "ankara": "TRY",
+        "antalya": "TRY",
+        "izmir": "TRY",
+        "bodrum": "TRY",
+
+        # Brazil
+        "rio de janeiro": "BRL",
+        "sao paulo": "BRL",
+
+        # Mexico
+        "mexico city": "MXN",
+
+        # South Africa
+        "cape town": "ZAR",
+        "johannesburg": "ZAR",
+    }
+
+    destination = destination.strip().lower()
+
+    # First check whether the country is present.
+    # Examples:
+    # "Mumbai, India" -> INR
+    # "Istanbul, Turkey" -> TRY
+    # "Tokyo, Japan" -> JPY
+    for country, currency in COUNTRY_CURRENCY.items():
+        if country in destination:
+            return currency
+
+    # If only a city was provided, check the city mapping.
+    for city, currency in CITY_CURRENCY.items():
+        if city in destination:
+            return currency
+
+    # Safe fallback if destination cannot be identified.
+    return "USD"
 
 async def search_hotels(
     destination: str,
