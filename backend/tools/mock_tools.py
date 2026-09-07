@@ -3,6 +3,7 @@ import os
 import requests
 from dotenv import load_dotenv
 
+
 async def check_availability(destination: str) -> dict:
     await asyncio.sleep(0.5)
 
@@ -37,11 +38,14 @@ async def confirm_booking(booking_id: str) -> dict:
         "booking_id": booking_id,
         "status": "confirmed",
     }
+
+
 import os
 import requests
 from dotenv import load_dotenv
 
 load_dotenv()
+
 
 async def search_flights(
     origin: str,
@@ -70,10 +74,7 @@ async def search_flights(
                     "departure_date": departure_date,
                 }
             ],
-            "passengers": [
-                {"type": "adult"}
-                for _ in range(max(1, adults))
-            ],
+            "passengers": [{"type": "adult"} for _ in range(max(1, adults))],
             "cabin_class": cabin_class,
         }
     }
@@ -110,16 +111,18 @@ async def search_flights(
 
             owner = offer.get("owner") or {}
 
-            results.append({
-                "offer_id": offer.get("id"),
-                "airline": owner.get("name"),
-                "price": offer.get("total_amount"),
-                "currency": offer.get("total_currency"),
-                "duration": first_slice.get("duration"),
-                "stops": max(0, len(segments) - 1),
-                "departure": first_segment.get("departing_at"),
-                "arrival": last_segment.get("arriving_at"),
-            })
+            results.append(
+                {
+                    "offer_id": offer.get("id"),
+                    "airline": owner.get("name"),
+                    "price": offer.get("total_amount"),
+                    "currency": offer.get("total_currency"),
+                    "duration": first_slice.get("duration"),
+                    "stops": max(0, len(segments) - 1),
+                    "departure": first_segment.get("departing_at"),
+                    "arrival": last_segment.get("arriving_at"),
+                }
+            )
 
         return {
             "tool": "search_flights",
@@ -138,6 +141,7 @@ async def search_flights(
             "status": "error",
             "message": f"Flight search failed: {str(e)}",
         }
+
 
 async def create_flight_booking(offer_id: str) -> dict:
     """Create a flight order using Duffel test mode."""
@@ -181,30 +185,34 @@ async def create_flight_booking(offer_id: str) -> dict:
 
         for i, passenger in enumerate(offer_passengers):
             if i == 0:
-                passengers.append({
-                    "id": passenger["id"],
-                    "type": "adult",
-                    "given_name": "Amelia",
-                    "family_name": "Earhart",
-                    "title": "ms",
-                    "gender": "f",
-                    "born_on": "1995-07-24",
-                    "email": "amelia.earhart@example.com",
-                    "phone_number": "+442080160509",
-                })
+                passengers.append(
+                    {
+                        "id": passenger["id"],
+                        "type": "adult",
+                        "given_name": "Amelia",
+                        "family_name": "Earhart",
+                        "title": "ms",
+                        "gender": "f",
+                        "born_on": "1995-07-24",
+                        "email": "amelia.earhart@example.com",
+                        "phone_number": "+442080160509",
+                    }
+                )
             else:
-                passengers.append({
-                    "id": passenger["id"],
-                    "type": "adult",
-                    "given_name": "John",
-                    "family_name": "Doe",
-                    "title": "mr",
-                    "gender": "m",
-                    "born_on": "1994-05-15",
-                    "email": "john.doe@example.com",
-                    "phone_number": "+442080160510",
-                })
-        
+                passengers.append(
+                    {
+                        "id": passenger["id"],
+                        "type": "adult",
+                        "given_name": "John",
+                        "family_name": "Doe",
+                        "title": "mr",
+                        "gender": "m",
+                        "born_on": "1994-05-15",
+                        "email": "john.doe@example.com",
+                        "phone_number": "+442080160510",
+                    }
+                )
+
         payload = {
             "data": {
                 "type": "instant",
@@ -276,7 +284,8 @@ async def create_flight_booking(offer_id: str) -> dict:
             "message": f"Flight booking failed: {str(e)}",
         }
 
-def get_currency_for_destination(destination: str) -> str:
+
+def get_currency_for_destination(destination: str) -> str | None:
     """Return the local currency for a destination."""
 
     COUNTRY_CURRENCY = {
@@ -286,29 +295,56 @@ def get_currency_for_destination(destination: str) -> str:
         "china": "CNY",
         "south korea": "KRW",
         "korea": "KRW",
+        "north korea": "KPW",
         "thailand": "THB",
         "vietnam": "VND",
         "indonesia": "IDR",
         "malaysia": "MYR",
         "singapore": "SGD",
+        "macau": "MOP",
         "philippines": "PHP",
         "taiwan": "TWD",
         "hong kong": "HKD",
         "nepal": "NPR",
+        "bhutan": "BTN",
         "sri lanka": "LKR",
         "bangladesh": "BDT",
         "pakistan": "PKR",
+        "myanmar": "MMK",
+        "cambodia": "KHR",
+        "laos": "LAK",
+        "mongolia": "MNT",
+        "brunei": "BND",
+        "timor-leste": "USD",
         "uae": "AED",
+        "kyrgyzstan": "KGS",
         "united arab emirates": "AED",
         "saudi arabia": "SAR",
+        "bahrain": "BHD",
+        "kuwait": "KWD",
+        "oman": "OMR",
+        "jordan": "JOD",
         "qatar": "QAR",
         "israel": "ILS",
         "turkey": "TRY",
-
+        "maldives": "MVR",
+        "lebanon": "LBP",
+        "iran": "IRR",
+        "iraq": "IQD",
+        "türkiye": "TRY",
+        "kazakhstan": "KZT",
+        "uzbekistan": "UZS",
+        "georgia": "GEL",
+        "armenia": "AMD",
+        "azerbaijan": "AZN",
+        "tajikistan": "TJS",
+        "turkmenistan": "TMT",
         # Europe
         "united kingdom": "GBP",
         "uk": "GBP",
         "england": "GBP",
+        "scotland": "GBP",
+        "wales": "GBP",
         "france": "EUR",
         "germany": "EUR",
         "italy": "EUR",
@@ -320,9 +356,23 @@ def get_currency_for_destination(destination: str) -> str:
         "ireland": "EUR",
         "greece": "EUR",
         "finland": "EUR",
+        "luxembourg": "EUR",
+        "malta": "EUR",
+        "cyprus": "EUR",
+        "estonia": "EUR",
+        "latvia": "EUR",
+        "lithuania": "EUR",
+        "slovakia": "EUR",
+        "slovenia": "EUR",
+        "croatia": "EUR",
+        "andorra": "EUR",
         "sweden": "SEK",
         "norway": "NOK",
         "denmark": "DKK",
+        "monaco": "EUR",
+        "san marino": "EUR",
+        "vatican city": "EUR",
+        "kosovo": "EUR",
         "switzerland": "CHF",
         "poland": "PLN",
         "czech republic": "CZK",
@@ -330,13 +380,37 @@ def get_currency_for_destination(destination: str) -> str:
         "hungary": "HUF",
         "romania": "RON",
         "ukraine": "UAH",
-
+        "bulgaria": "BGN",
+        "serbia": "RSD",
+        "iceland": "ISK",
+        "albania": "ALL",
+        "bosnia and herzegovina": "BAM",
+        "montenegro": "EUR",
+        "north macedonia": "MKD",
+        "moldova": "MDL",
+        "russia": "RUB",
+        "belarus": "BYN",
         # North America
         "united states": "USD",
         "usa": "USD",
         "canada": "CAD",
         "mexico": "MXN",
-
+        # Caribbean
+        "bahamas": "BSD",
+        "barbados": "BBD",
+        "jamaica": "JMD",
+        "trinidad and tobago": "TTD",
+        "dominican republic": "DOP",
+        "cuba": "CUP",
+        "haiti": "HTG",
+        # Central America
+        "guatemala": "GTQ",
+        "belize": "BZD",
+        "honduras": "HNL",
+        "el salvador": "USD",
+        "nicaragua": "NIO",
+        "costa rica": "CRC",
+        "panama": "PAB",
         # South America
         "brazil": "BRL",
         "argentina": "ARS",
@@ -344,20 +418,98 @@ def get_currency_for_destination(destination: str) -> str:
         "colombia": "COP",
         "peru": "PEN",
         "uruguay": "UYU",
-
+        "paraguay": "PYG",
+        "bolivia": "BOB",
+        "ecuador": "USD",
+        "venezuela": "VES",
+        "guyana": "GYD",
+        "suriname": "SRD",
         # Oceania
         "australia": "AUD",
         "new zealand": "NZD",
         "fiji": "FJD",
-
+        "samoa": "WST",
+        "tonga": "TOP",
+        "vanuatu": "VUV",
+        "solomon islands": "SBD",
+        "papua new guinea": "PGK",
+        "palau": "USD",
+        "micronesia": "USD",
+        "marshall islands": "USD",
+        "kiribati": "AUD",
+        "tuvalu": "AUD",
+        "nauru": "AUD",
         # Africa
         "south africa": "ZAR",
         "egypt": "EGP",
         "morocco": "MAD",
+        "libya": "LYD",
         "kenya": "KES",
         "nigeria": "NGN",
         "ghana": "GHS",
         "tanzania": "TZS",
+        "tunisia": "TND",
+        "algeria": "DZD",
+        "uganda": "UGX",
+        "ethiopia": "ETB",
+        "rwanda": "RWF",
+        "mauritius": "MUR",
+        "seychelles": "SCR",
+        "botswana": "BWP",
+        "namibia": "NAD",
+        "zambia": "ZMW",
+        "zimbabwe": "ZWG",
+        "mozambique": "MZN",
+        "angola": "AOA",
+        "senegal": "XOF",
+        "ivory coast": "XOF",
+        "cote d'ivoire": "XOF",
+        "cameroon": "XAF",
+        "gabon": "XAF",
+        "republic of the congo": "XAF",
+        "congo": "XAF",
+        "democratic republic of the congo": "CDF",
+        "madagascar": "MGA",
+        "malawi": "MWK",
+        "sierra leone": "SLE",
+        "liberia": "LRD",
+        "cape verde": "CVE",
+        "mali": "XOF",
+        "burkina faso": "XOF",
+        "niger": "XOF",
+        "togo": "XOF",
+        "benin": "XOF",
+        "guinea-bissau": "XOF",
+        "central african republic": "XAF",
+        "chad": "XAF",
+        "equatorial guinea": "XAF",
+        "comoros": "KMF",
+        "djibouti": "DJF",
+        "eritrea": "ERN",
+        "somalia": "SOS",
+        "sudan": "SDG",
+        "south sudan": "SSP",
+        "mauritania": "MRU",
+        "burundi": "BIF",
+        # Europe / Caucasus
+        "liechtenstein": "CHF",
+        # Asia
+        "afghanistan": "AFN",
+        "yemen": "YER",
+        "syria": "SYP",
+        # Africa
+        "eswatini": "SZL",
+        "lesotho": "LSL",
+        "gambia": "GMD",
+        "guinea": "GNF",
+        "somaliland": "SOS",
+        # Caribbean
+        "antigua and barbuda": "XCD",
+        "dominica": "XCD",
+        "grenada": "XCD",
+        "saint kitts and nevis": "XCD",
+        "saint lucia": "XCD",
+        "saint vincent and the grenadines": "XCD",
     }
 
     CITY_CURRENCY = {
@@ -372,33 +524,44 @@ def get_currency_for_destination(destination: str) -> str:
         "kolkata": "INR",
         "pune": "INR",
         "goa": "INR",
-
+        "kyrgyzstan": "KGS",
+        "bishkek": "KGS",
         # Japan
         "tokyo": "JPY",
         "osaka": "JPY",
         "kyoto": "JPY",
-
         # China
         "beijing": "CNY",
         "shanghai": "CNY",
-
         # South Korea
         "seoul": "KRW",
-
+        "busan": "KRW",
         # Thailand
         "bangkok": "THB",
         "phuket": "THB",
-
+        "pattaya": "THB",
+        # Maldives
+        "male": "MVR",
+        "malé": "MVR",
+        # Turkey
+        "istanbul": "TRY",
+        "ankara": "TRY",
+        "antalya": "TRY",
+        "izmir": "TRY",
+        "bodrum": "TRY",
+        # UAE
+        "dubai": "AED",
+        "abu dhabi": "AED",
         # Singapore
         "singapore": "SGD",
-
         # UK
         "london": "GBP",
         "manchester": "GBP",
         "edinburgh": "GBP",
-
         # Europe
         "paris": "EUR",
+        "nice": "EUR",
+        "lyon": "EUR",
         "berlin": "EUR",
         "rome": "EUR",
         "madrid": "EUR",
@@ -407,7 +570,19 @@ def get_currency_for_destination(destination: str) -> str:
         "vienna": "EUR",
         "lisbon": "EUR",
         "athens": "EUR",
-
+        # Italy
+        "milan": "EUR",
+        "venice": "EUR",
+        "florence": "EUR",
+        # Spain
+        "seville": "EUR",
+        # Germany
+        "munich": "EUR",
+        "frankfurt": "EUR",
+        # Switzerland
+        "zurich": "CHF",
+        "geneva": "CHF",
+        "lucerne": "CHF",
         # USA
         "new york": "USD",
         "los angeles": "USD",
@@ -416,42 +591,54 @@ def get_currency_for_destination(destination: str) -> str:
         "las vegas": "USD",
         "miami": "USD",
         "seattle": "USD",
-
+        "boston": "USD",
+        "orlando": "USD",
         # Canada
         "toronto": "CAD",
         "vancouver": "CAD",
         "montreal": "CAD",
-
         # Australia
         "sydney": "AUD",
         "melbourne": "AUD",
         "brisbane": "AUD",
-
-        # UAE
-        "dubai": "AED",
-        "abu dhabi": "AED",
-
-        # Switzerland
-        "zurich": "CHF",
-        "geneva": "CHF",
-
-        # Turkey
-        "istanbul": "TRY",
-        "ankara": "TRY",
-        "antalya": "TRY",
-        "izmir": "TRY",
-        "bodrum": "TRY",
-
+        "perth": "AUD",
+        # New Zealand
+        "auckland": "NZD",
+        "wellington": "NZD",
+        "queenstown": "NZD",
         # Brazil
         "rio de janeiro": "BRL",
         "sao paulo": "BRL",
-
         # Mexico
         "mexico city": "MXN",
-
+        "cancun": "MXN",
+        # Egypt
+        "cairo": "EGP",
+        "sharm el sheikh": "EGP",
+        # Morocco
+        "marrakech": "MAD",
+        "casablanca": "MAD",
         # South Africa
         "cape town": "ZAR",
         "johannesburg": "ZAR",
+        # Kenya
+        "nairobi": "KES",
+        # Indonesia
+        "bali": "IDR",
+        "jakarta": "IDR",
+        # Vietnam
+        "hanoi": "VND",
+        "ho chi minh city": "VND",
+        # Malaysia
+        "kuala lumpur": "MYR",
+        # Philippines
+        "manila": "PHP",
+        "cebu": "PHP",
+        # Portugal
+        "porto": "EUR",
+        # Greece
+        "santorini": "EUR",
+        "mykonos": "EUR",
     }
 
     destination = destination.strip().lower()
@@ -471,7 +658,8 @@ def get_currency_for_destination(destination: str) -> str:
             return currency
 
     # Safe fallback if destination cannot be identified.
-    return "USD"
+    return None
+
 
 async def search_hotels(
     destination: str,
@@ -491,14 +679,15 @@ async def search_hotels(
             "message": "StayAPI key is not configured.",
         }
 
+    currency= get_currency_for_destination(destination)
     params = {
         "location": destination,
         "check_in": check_in,
         "check_out": check_out,
         "adults": adults,
-        "currency": get_currency_for_destination(destination),
     }
-
+    if currency:
+        params["currency"] = currency
     try:
         response = await asyncio.to_thread(
             requests.get,
@@ -519,18 +708,20 @@ async def search_hotels(
             price = hotel.get("price", {})
             rating = hotel.get("rating", {})
 
-            results.append({
-                "name": hotel.get("name"),
-                "rating": rating.get("value"),
-                "votes": rating.get("votes"),
-                "price_per_night": price.get("price_per_night"),
-                "currency": price.get("currency") or params["currency"],
-                "description": hotel.get("description"),
-                "amenities": hotel.get("amenities", [])[:8],
-                "check_in_time": hotel.get("check_in_time"),
-                "check_out_time": hotel.get("check_out_time"),
-                "hotel_id": hotel.get("hotel_id"),
-            })
+            results.append(
+                {
+                    "name": hotel.get("name"),
+                    "rating": rating.get("value"),
+                    "votes": rating.get("votes"),
+                    "price_per_night": price.get("price_per_night"),
+                    "currency": price.get("currency") or currency,
+                    "description": hotel.get("description"),
+                    "amenities": hotel.get("amenities", [])[:8],
+                    "check_in_time": hotel.get("check_in_time"),
+                    "check_out_time": hotel.get("check_out_time"),
+                    "hotel_id": hotel.get("hotel_id"),
+                }
+            )
 
         return {
             "tool": "search_hotels",
@@ -547,6 +738,8 @@ async def search_hotels(
             "status": "error",
             "message": f"Hotel search failed: {str(e)}",
         }
+
+
 async def create_hotel_booking(
     hotel_name: str,
     destination: str,
@@ -571,7 +764,9 @@ async def create_hotel_booking(
         # has to reject the late result.
         await asyncio.sleep(2.0)
 
-    booking_id = f"HTL-{abs(hash((hotel_name, destination, check_in, check_out))) % 100000:05d}"
+    booking_id = (
+        f"HTL-{abs(hash((hotel_name, destination, check_in, check_out))) % 100000:05d}"
+    )
 
     return {
         "tool": "create_hotel_booking",
