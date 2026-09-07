@@ -51,6 +51,7 @@ class TurnController:
         self._current_context: TurnContext | None = None
         self._operations: dict[str, Operation] = {}
         self._next_operation_id = 1
+        
 
     def start_generation(self) -> TurnContext:
         """Invalidate the previous generation and create a new one."""

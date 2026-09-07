@@ -301,7 +301,7 @@ class TravelAgent(Agent):
 
         return " ".join(response)
 
-    @function_tool
+    @function_tool(on_duplicate="reject")
     async def create_flight_booking(
         self,
         ctx: RunContext,
