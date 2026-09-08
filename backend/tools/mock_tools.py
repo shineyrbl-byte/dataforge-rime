@@ -665,7 +665,6 @@ def get_currency_for_destination(destination: str) -> str | None:
     # Safe fallback if destination cannot be identified.
     return None
 
-
 async def search_hotels(
     destination: str,
     check_in: str,
@@ -673,31 +672,36 @@ async def search_hotels(
     adults: int,
     children: int = 0,
 ) -> dict:
-    """Search for real, current hotels using StayAPI."""
+    """Search for real, current hotels using SerpApi Google Hotels."""
 
-    api_key = os.getenv("STAYAPI_KEY")
+    api_key = os.getenv("SERPAPI_KEY")
 
     if not api_key:
         return {
             "tool": "search_hotels",
             "status": "error",
-            "message": "StayAPI key is not configured.",
+            "message": "SerpApi key is not configured.",
         }
 
-    currency= get_currency_for_destination(destination)
+    currency = get_currency_for_destination(destination)
+
     params = {
-        "location": destination,
-        "check_in": check_in,
-        "check_out": check_out,
+        "engine": "google_hotels",
+        "q": destination,
+        "check_in_date": check_in,
+        "check_out_date": check_out,
         "adults": adults,
+        "children": children,
+        "currency": currency or "USD",
+        "hl": "en",
+        "gl": "us",
+        "api_key": api_key,
     }
-    if currency:
-        params["currency"] = currency
+
     try:
         response = await asyncio.to_thread(
             requests.get,
-            "https://api.stayapi.com/v1/google_hotels/search",
-            headers={"X-API-Key": api_key},
+            "https://serpapi.com/search.json",
             params=params,
             timeout=20,
         )
@@ -705,30 +709,35 @@ async def search_hotels(
         response.raise_for_status()
         data = response.json()
 
-        hotels = data.get("hotels", [])[:5]
+        hotels = data.get("properties", [])
 
         results = []
 
         for hotel in hotels:
-            price = hotel.get("price", {})
-            print ("DEBUG REQUESTED CURRENCY:", currency)
-            print ("DEBUG STAYAPI PRICE:", price)
-            rating = hotel.get("rating", {})
+            rate_per_night = hotel.get("rate_per_night", {})
+            total_rate = hotel.get("total_rate", {})
+
+            price_per_night = rate_per_night.get("extracted_lowest")
+            total_price = total_rate.get("extracted_lowest")
 
             results.append(
                 {
                     "name": hotel.get("name"),
-                    "rating": rating.get("value"),
-                    "votes": rating.get("votes"),
-                    "price_per_night": price.get("price_per_night"),
-                    "currency": price.get("currency") or currency,
-                    "description": hotel.get("description"),
+                    "rating": hotel.get("overall_rating"),
+                    "votes": hotel.get("reviews"),
+                    "price_per_night": price_per_night,
+                    "total_price": total_price,
+                    "currency": currency or "USD",
+                    "description": hotel.get("description", ""),
                     "amenities": hotel.get("amenities", [])[:8],
                     "check_in_time": hotel.get("check_in_time"),
                     "check_out_time": hotel.get("check_out_time"),
-                    "hotel_id": hotel.get("hotel_id"),
+                    "hotel_id": hotel.get("property_token"),
                 }
             )
+
+            if len(results) >= 5:
+                break
 
         return {
             "tool": "search_hotels",
