@@ -95,7 +95,7 @@ class TravelAgent(Agent):
     ),
 )
 
-    @function_tool
+    @function_tool(on_duplicate="reject")
     async def check_flight_availability(self, destination: str) -> str:
         """Check flight availability.
         ALWAYS call this tool when the user asks to reschedule,
@@ -119,7 +119,7 @@ class TravelAgent(Agent):
 
         return str(result)
 
-    @function_tool
+    @function_tool(on_duplicate="reject")
     async def modify_flight(
         self,
         destination: str,
@@ -374,7 +374,7 @@ class TravelAgent(Agent):
             f"This is a test booking and no real payment was made."
         )
 
-    @function_tool
+    @function_tool(on_duplicate="reject")
     async def search_flights(
         self,
         ctx: RunContext,
@@ -612,6 +612,7 @@ async def entrypoint(ctx: JobContext):
         llm=groq.LLM(
             api_key=GROQ_API_KEY,
             model=GROQ_MODEL,
+            reasoning_effort="low",
         ),
         tts=rime.TTS(
             model="coda",
